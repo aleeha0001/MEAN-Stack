@@ -12,12 +12,9 @@ router.get('/edit/:id', providersController.edit);
 router.post('/update/:id', providersController.update);
 /* GET Add Page */
 router.get('/add-provider/', providersController.addform);
-/* POST Add  */
+/* POST Add Page */
 router.post('/add', providersController.add);
-// router.get('/about', mainController.about);
-// router.get('/contact', mainController.contact);
-// router.get('/login', mainController.login);
-// router.get('/register', mainController.register);
-// router.get('/forgot-password', mainController.forgotpassword);
+/* GET Delete Page */
+router.get('/delete/:id', providersController.delete);
 
 module.exports = router;

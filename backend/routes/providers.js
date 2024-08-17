@@ -8,8 +8,12 @@ router.get('/', providersController.list);
 router.get('/details/:id', providersController.details);
 /* GET Edit Page */
 router.get('/edit/:id', providersController.edit);
-/* GET update Page */
+/* POST update Page */
 router.post('/update/:id', providersController.update);
+/* GET Add Page */
+router.get('/add-provider/', providersController.addform);
+/* POST Add  */
+router.post('/add', providersController.add);
 // router.get('/about', mainController.about);
 // router.get('/contact', mainController.contact);
 // router.get('/login', mainController.login);

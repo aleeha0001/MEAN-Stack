@@ -1,34 +1,45 @@
 var providers = require('../models/providers.models');
 
+// Util Functions
+// Cehck if list is empty
+function isEmptyList(obj) {
+    return (!obj || obj.lenght == 0 || Object.keys(obj).length == 0);
+}
+
+// Check for existing provided
+function existsProvider(id) {
+    return providers.find(provider => provider.id == id);;
+}
+
+// Generate a unique provider id
+function getUniqueId(providers) {
+    //  Create random id
+    let min = 100000;
+    let max = 999999;
+    do {
+        var id = Math.floor(Math.random() * (max - min) + min);
+    } while (existsProvider(id));
+
+    return id;
+}
+
 // CRUD - Create(Post), Read(Get), Update(Put), Delete
 
 // POST
 // uri: /api/providers
 module.exports.create = function (req, res) {
-    //  Create random id
-    let min = 100000;
-    let max = 999999;
-    let id = Math.floor(Math.random() * (max - min) + min);
-
-    // Create new provider object
-    let provider = {
-        id: id,
-        firstname: req.body.firstname,
-        lastname: req.body.lastname,
-        position: req.body.position,
-        company: {
-            company_name: req.body.company.company_name,
-            address: req.body.company.address,
-            address2: req.body.company.address2,
-            city: req.body.company.city,
-            state: req.body.company.state,
-            postal_code: req.body.company.postal_code,
-            phone: req.body.company.phone,
-            email: req.body.company.email,
-            description: req.body.company.description,
-            tagline: req.body.company.tagline
-        }
+    if(isEmptyList(providers)){
+        providers=[];
     }
+    var id= req.body.id;
+    if(existsProvider(id)){
+        res.status(400);
+        res.send('Duplicate id not allowed.');
+        id=getUniqueId();
+    }
+    var provider= req.body; //get new provider
+    provider.id=id;
+    
     // Add new provider to list
     providers.push(provider);
     res.status(200);
@@ -37,12 +48,20 @@ module.exports.create = function (req, res) {
 // GET All
 // uri: /api/providers
 module.exports.readAll = function (req, res) {
+    if(isEmptyList(providers)){
+        res.status(404);
+        res.send('List is empty.');
+    }
     res.status(200);
     res.send(providers);
 };
 // GET One
 // uri: /api/providers/:id
 module.exports.readOne = function (req, res) {
+    if(isEmptyList(providers)){
+        res.status(404);
+        res.send('List is empty.');
+    }
     let id = req.params.id;
     let provider = providers.find(provider => provider.id == id);
     res.status(200);
@@ -51,6 +70,10 @@ module.exports.readOne = function (req, res) {
 // PUT
 // uri: /api/providers/:id
 module.exports.update = function (req, res) {
+    if(isEmptyList(providers)){
+        res.status(404);
+        res.send('List is empty. Cannot update.');
+    }
     let id = req.params.id;
     let provider = providers.find(provider => provider.id == id);
     provider.firstname = req.body.firstname;
@@ -74,6 +97,10 @@ module.exports.update = function (req, res) {
 // DELETE ONE
 // uri: /api/providers/:id
 module.exports.deleteOne = function (req, res) {
+    if(isEmptyList(providers)){
+        res.status(404);
+        res.send('List is empty. Cannot delete');
+    }
     let id = req.params.id;
     let provider = providers.find(provider => provider.id == id);
     let idx = providers.indexOf(provider);
@@ -85,6 +112,10 @@ module.exports.deleteOne = function (req, res) {
 // DELETE ALL
 // uri: /api/providers
 module.exports.deleteAll = function (req, res) {
+    if(isEmptyList(providers)){
+        res.status(404);
+        res.send('List is empty. Cannot delete.');
+    }
     provider = [];
     res.status(200);
     res.send("All providers deleted!");

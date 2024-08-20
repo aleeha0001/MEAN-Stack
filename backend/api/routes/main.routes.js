@@ -7,18 +7,18 @@ const mainController = require('../controllers/main.controller');
 // POST  /api/providers
 router.post('/providers', mainController.create);
 
-// Get /api/providers
-router.post('/providers', mainController.readAll);
+// Get All /api/providers
+router.get('/providers', mainController.readAll);
 // Get one /api/providers/{id}
-router.post('/providers/:id', mainController.readOne);
+router.get('/providers/:id', mainController.readOne);
 
 // Put /api/providers
-router.post('/providers', mainController.update);
+router.put('/providers', mainController.update);
 
 // Delete one /api/providers 
-router.post('/providers/:id', mainController.deleteOne);
+router.delete('/providers/:id', mainController.deleteOne);
 
 // Delete /api/providers 
-router.post('/providers/', mainController.deleteAll);
+router.delete('/providers/', mainController.deleteAll);
 
 module.exports = router;

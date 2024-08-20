@@ -13,7 +13,7 @@ router.get('/providers', mainController.readAll);
 router.get('/providers/:id', mainController.readOne);
 
 // Put /api/providers
-router.put('/providers', mainController.update);
+router.put('/providers/:id', mainController.update);
 
 // Delete one /api/providers 
 router.delete('/providers/:id', mainController.deleteOne);

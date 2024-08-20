@@ -32,7 +32,7 @@ module.exports.create = function (req, res) {
     // Add new provider to list
     providers.push(provider);
     res.status(200);
-    res.send(provider)
+    res.send(provider);
 };
 // GET All
 // uri: /api/providers
@@ -49,7 +49,7 @@ module.exports.readOne = function (req, res) {
     res.send(provider);
 };
 // PUT
-// uri: /api/providers
+// uri: /api/providers/:id
 module.exports.update = function (req, res) {
     let id = req.params.id;
     let provider = providers.find(provider => provider.id == id);

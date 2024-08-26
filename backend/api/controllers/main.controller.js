@@ -1,76 +1,107 @@
 var providers = require('../models/providers.models');
+var Provider = require('../db/db');
+const { ObjectId } = require('mongodb');
 
 // Util Functions
 // Cehck if list is empty
 function isEmptyList(obj) {
-    return (!obj || obj.lenght == 0 || Object.keys(obj).length == 0);
+    return (!obj || obj.length == 0 || Object.keys(obj).length == 0);
 }
 
 // Check for existing provided
-function existsProvider(id) {
-    return providers.find(provider => provider.id == id);;
-}
+// function existsProvider(id) {
+//     return providers.find(provider => provider.id == id);;
+// }
 
 // Generate a unique provider id
-function getUniqueId(providers) {
-    //  Create random id
-    let min = 100000;
-    let max = 999999;
-    do {
-        var id = Math.floor(Math.random() * (max - min) + min);
-    } while (existsProvider(id));
+// function getUniqueId(providers) {
+//     //  Create random id
+//     let min = 100000;
+//     let max = 999999;
+//     do {
+//         var id = Math.floor(Math.random() * (max - min) + min);
+//     } while (existsProvider(id));
 
-    return id;
-}
+//     return id;
+// }
 
 // CRUD - Create(Post), Read(Get), Update(Put), Delete
 
 // POST
 // uri: /api/providers
 module.exports.create = function (req, res) {
-    if(isEmptyList(providers)){
-        providers=[];
+    if (isEmptyList(providers)) {
+        providers = [];
     }
-    var id= req.body.id;
-    if(existsProvider(id)){
+    var id = req.body.id;
+    if (existsProvider(id)) {
         res.status(400);
         res.send('Duplicate id not allowed.');
-        id=getUniqueId();
+        id = getUniqueId();
     }
-    var provider= req.body; //get new provider
-    provider.id=id;
-    
+    var provider = req.body; //get new provider
+    provider.id = id;
+
     // Add new provider to list
     providers.push(provider);
     res.status(200);
     res.send(provider);
 };
+
+// Handle Errors
+function handleError(res, error) {
+    res.status(200);
+    res.send('Soemthing went wrong.\n' + error);
+}
+
 // GET All
 // uri: /api/providers
 module.exports.readAll = function (req, res) {
-    if(isEmptyList(providers)){
-        res.status(404);
-        res.send('List is empty.');
+    try {
+        Provider.find()
+            .then(result => {
+                if (isEmptyList(result)) {
+                    res.status(404);
+                    res.send('List is empty.');
+                }
+                res.status(200);
+                res.send(result);
+            })
+            .catch(error => handleError(res, error));
     }
-    res.status(200);
-    res.send(providers);
+    catch (error) {
+        handleError(res, error)
+    };
+
 };
 // GET One
 // uri: /api/providers/:id
 module.exports.readOne = function (req, res) {
-    if(isEmptyList(providers)){
-        res.status(404);
-        res.send('List is empty.');
+    try {
+        let id =new ObjectId(req.params.id);
+        Provider.find({'_id':id})
+        .then(result=>{
+            if (isEmptyList(result)) {
+                res.status(404);
+                res.send('List is empty.');
+            }
+    
+            //let provider = providers.find(provider => provider.id == id);
+            res.status(200);
+            res.send(result);
+        })
+        .catch(error => handleError(res, error));
+        
     }
-    let id = req.params.id;
-    let provider = providers.find(provider => provider.id == id);
-    res.status(200);
-    res.send(provider);
+    catch (error) {
+        handleError(res, error)
+    };
+
 };
 // PUT
 // uri: /api/providers/:id
 module.exports.update = function (req, res) {
-    if(isEmptyList(providers)){
+    if (isEmptyList(providers)) {
         res.status(404);
         res.send('List is empty. Cannot update.');
     }
@@ -97,7 +128,7 @@ module.exports.update = function (req, res) {
 // DELETE ONE
 // uri: /api/providers/:id
 module.exports.deleteOne = function (req, res) {
-    if(isEmptyList(providers)){
+    if (isEmptyList(providers)) {
         res.status(404);
         res.send('List is empty. Cannot delete');
     }
@@ -112,7 +143,7 @@ module.exports.deleteOne = function (req, res) {
 // DELETE ALL
 // uri: /api/providers
 module.exports.deleteAll = function (req, res) {
-    if(isEmptyList(providers)){
+    if (isEmptyList(providers)) {
         res.status(404);
         res.send('List is empty. Cannot delete.');
     }

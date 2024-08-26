@@ -7,52 +7,37 @@ const { ObjectId } = require('mongodb');
 function isEmptyList(obj) {
     return (!obj || obj.length == 0 || Object.keys(obj).length == 0);
 }
-
-// Check for existing provided
-// function existsProvider(id) {
-//     return providers.find(provider => provider.id == id);;
-// }
-
-// Generate a unique provider id
-// function getUniqueId(providers) {
-//     //  Create random id
-//     let min = 100000;
-//     let max = 999999;
-//     do {
-//         var id = Math.floor(Math.random() * (max - min) + min);
-//     } while (existsProvider(id));
-
-//     return id;
-// }
+// Handle Errors
+function handleError(res, error) {
+    res.status(200);
+    res.send('Soemthing went wrong.\n' + error);
+}
 
 // CRUD - Create(Post), Read(Get), Update(Put), Delete
 
 // POST
 // uri: /api/providers
 module.exports.create = function (req, res) {
-    if (isEmptyList(providers)) {
-        providers = [];
-    }
-    var id = req.body.id;
-    if (existsProvider(id)) {
-        res.status(400);
-        res.send('Duplicate id not allowed.');
-        id = getUniqueId();
-    }
-    var provider = req.body; //get new provider
-    provider.id = id;
+    try {
 
-    // Add new provider to list
-    providers.push(provider);
-    res.status(200);
-    res.send(provider);
+        var provider = req.body; //get new provider
+        Provider.create(provider)
+            .then(result => {
+                res.status(201);
+                res.send(result);
+            })
+            .catch(error => handleError(res, error));
+        //provider.id = id;
+
+        // Add new provider to list
+        //providers.push(provider);
+
+    } catch (error) {
+        handleError(res, error)
+    }
 };
 
-// Handle Errors
-function handleError(res, error) {
-    res.status(200);
-    res.send('Soemthing went wrong.\n' + error);
-}
+
 
 // GET All
 // uri: /api/providers
@@ -78,20 +63,18 @@ module.exports.readAll = function (req, res) {
 // uri: /api/providers/:id
 module.exports.readOne = function (req, res) {
     try {
-        let id =new ObjectId(req.params.id);
-        Provider.find({'_id':id})
-        .then(result=>{
-            if (isEmptyList(result)) {
-                res.status(404);
-                res.send('List is empty.');
-            }
-    
-            //let provider = providers.find(provider => provider.id == id);
-            res.status(200);
-            res.send(result);
-        })
-        .catch(error => handleError(res, error));
-        
+        let id = new ObjectId(req.params.id);
+        Provider.find({ '_id': id })
+            .then(result => {
+                if (isEmptyList(result)) {
+                    res.status(404);
+                    res.send('List is empty.');
+                }
+                res.status(200);
+                res.send(result);
+            })
+            .catch(error => handleError(res, error));
+
     }
     catch (error) {
         handleError(res, error)
